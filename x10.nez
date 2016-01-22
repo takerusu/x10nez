@@ -11,11 +11,45 @@ LINECOMMENT               = '//' ( ![\r\n] . )*
 W                         = [a-zA-Z_0-9]
 
 /* Declarations */
-PackageDeclaration        = { 'package P;' #Stub }
-ImportDeclarations        = { 'import I;' #Stub }
+PackageDeclaration        = { ($(Annotations) _)? "package" _ $(PackageName) #PackageDeclaration }
+PackageName               = Identifier {$ '.' $(Identifier) #PackageName }*
+ImportDeclarations        = { $(ImportDeclaration) (_ $(ImportDeclaration) )* #ImportDeclarations }
+ImportDeclaration         = { $(TypeImportOnDemandDecln) #ImportDeclaration }
+                          / { $(SingleTypeImportDecln) #ImportDeclaration }
+TypeImportOnDemandDecln   = { "import" _ $(PackageOrTypeName) '.*' #TypeImportOnDemandDeclaration }
+PackageOrTypeName         = Identifier {$ '.' $(Identifier) #PackageOrTypeName }*
+SingleTypeImportDecln     = { "import" _ $(TypeName) ';' #SingleTypeImportDeclaration }
+TypeName                  = Identifier {$ '.' $(Identifier) #TypeName }*
 
-TypeDeclarations          = { 'class X{}' #Stub }
-ClassDeclaration          = { 'class X{}' #Stub }
+TypeDeclarations          = { $(TypeDeclaration) (_ $(TypeDeclaration) )* #TypeDeclarations }
+TypeDeclaration           = ClassDeclaration
+                          / StructDeclaration
+                          / InterfaceDeclaration
+                          / TypeDefDeclaration
+                          / ';'
+ClassDeclaration          = { ($(Mods) _)? "class" _ $(Identifier) (_ $(TypeParametersI))? (_ $(Properties))? (_ $(Guard))? (_ $(Super))? (_ $(Interfaces))? $(ClassBody) #ClassDeclaration }
+Mods                      = { $(Mod) (_ $(Mod))* #Mods }
+Mod                       = { "abstract" #Abstruact }
+                          / Annotations
+                          / { "atomic" #Atomic }
+                          / { "final" #Final }
+                          / { "native" #Native }
+                          / { "private" #Private }
+                          / { "protected" #Protected }
+                          / { "public" #Public }
+                          / { "static" #Static }
+                          / { "transient" #Transient}
+                          / { "clocked" #Clocked }
+Properties                = {'(' _ PropList _ ')' #Properties }
+PropList                  = $(Prop) (_ $(Prop))*
+Prop                      = { ($(Annotations) _)? $(Identifier) _ $(ResultType) #Prop }
+ResultType                = { ':' _ $(Type) #ResultType }
+Guard                     = { $(DepParams) #Guard }
+DepParams                 = { $(Expressions) #DepParams }
+Super                     = { "extends" _ $(ClassType) #Super }
+ClassType                 = { "type" #Stub }
+Interfaces                = { "implements"}
+ClassBody
 StructDeclaration         = { 'struct X{}' #Stub }
 InterfaceDeclaration      = { 'interface X{}' #Stub }
 TypeDefDeclaration        = { 'type ID = int;' #Stub }
@@ -29,10 +63,10 @@ LocalVariableDeclaration  = { 'var x = 1' #Stub }
 Formals                   = { '(ID : Int)' #Stub }
 LoopIndex                 = { 'li' #Stub }
 
-example PackageDeclaration '''
+example PackageDeclaration ~330ab8a0a264a '''
 package ID.ID;
 '''
-example ImportDeclarations '''
+example ImportDeclarations ~ae89b17e0ec6f '''
 import ID.ID;
 import ID.ID.*;
 '''
@@ -70,7 +104,6 @@ var ID : Int;
 
 /* Types */
 Type                      = { 'Int' #Stub }
-
 Annotations               = { '@A' #Stub }
 
 TypeArguments             = { '[Int,Int]' #Stub }
@@ -374,4 +407,3 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
 "!~"                      = '!~'
 "-<"                      = '-<'
 ">-"                      = '>-'
-
