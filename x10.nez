@@ -27,7 +27,7 @@ TypeDeclaration           = ClassDeclaration
                           / InterfaceDeclaration
                           / TypeDefDeclaration
                           / ';'
-ClassDeclaration          = { ($(Mods) _)? "class" _ $(Identifier) (_ $(TypeParametersI))? (_ $(Properties))? (_ $(Guard))? (_ $(Super))? (_ $(Interfaces))? $(ClassBody) #ClassDeclaration }
+ClassDeclaration          = { ($(Mods) _)? "class" _ $(Identifier) (_ $(TypeParametersI))? (_ $(Properties))? (_ $(Guard))? (_ $(Super))? (_ $(Interfaces))? _ $(ClassBody) #ClassDeclaration }
 Mods                      = { $(Mod) (_ $(Mod))* #Mods }
 Mod                       = { "abstract" #Abstruact }
                           / Annotations
@@ -44,12 +44,26 @@ Properties                = {'(' _ PropList _ ')' #Properties }
 PropList                  = $(Prop) (_ $(Prop))*
 Prop                      = { ($(Annotations) _)? $(Identifier) _ $(ResultType) #Prop }
 ResultType                = { ':' _ $(Type) #ResultType }
-Guard                     = { $(DepParams) #Guard }
-DepParams                 = { $(Expressions) #DepParams }
+Guard                     = { '{' _ $(DepParams) _ '}' #Guard }
+DepParams                 = { $(Expression) #DepParams }
 Super                     = { "extends" _ $(ClassType) #Super }
-ClassType                 = { "type" #Stub }
-Interfaces                = { "implements"}
-ClassBody
+ClassType                 = { 'ID' #Stub }
+Interfaces                = { "implements" _ $(InterfaceType) #Interfaces }
+InterfaceType             = { 'ID' #Stub }
+ClassBody                 = { '{' (_ $(ClassMemberDeclns))? _ '}' #ClassBody }
+ClassMemberDeclns         = { $(ClassMemberDecln) (_ $(ClassMemberDecln))* #ClassMemberDeclns }
+ClassMemberDecln          = InterfaceMemberDecln
+                          / CtorDecln
+InterfaceMemberDecln      = MethodDeclaration
+                          / PropertyMethodDeclaration
+                          / FieldDeclaration
+                          / TypeDecln
+CtorDecln                 = {}
+TypeDecln                 = ClassDeclaration
+                          / StructDeclaration
+                          / InterfaceDeclaration
+                          / TypeDefDeclaration
+                          / ';'
 StructDeclaration         = { 'struct X{}' #Stub }
 InterfaceDeclaration      = { 'interface X{}' #Stub }
 TypeDefDeclaration        = { 'type ID = int;' #Stub }
@@ -110,17 +124,17 @@ TypeArguments             = { '[Int,Int]' #Stub }
 TypeParameters            = { '[ID,ID]' #Stub }
 TypeParametersI           = { '[ID,]' #Stub }
 
-example Type Int
+/*example Type Int
 example Type ID[ID]
 example Type ID[ID,ID]
 example Type ID.ID
-example Type (ID : Int) => Int
+example Type (ID : Int) => Int*/
 
 
 /* Statements */
 Block                     = { '{}' #Stub }
 Statement                 = { 'stmt' #Stub }
-
+/*
 example Block {}
 example Block '''
 {
@@ -171,13 +185,13 @@ example Statement clocked finish {}
 example Statement ateach(li in exp) {}
 example Statement ateach(exp) {}
 example Statement atomic {}
-example Statement when(exp) {}
+example Statement when(exp) {}*/
 
 
 /* Expressions */
 Arguments                 = { '()' #Stub }
 Expression                = { 'exp' #Stub }
-
+/*
 example Expression ID
 example Expression 1
 example Expression this
@@ -214,13 +228,13 @@ example Expression ID.new ID()
 example Expression new ID() {}
 example Expression [1, 1, 1]
 example Expression (ID : Int) => @A {}
-example Expression at(this) ID
+example Expression at(this) ID*/
 
 
 /* Identifiers */
 Identifier                = { 'ID' #Stub }
 FullyQualifiedName        = { 'ID' #Stub }
-
+/*
 example Identifier Hoge_piyo
 example Identifier Fuga1
 example Identifier As
@@ -230,12 +244,12 @@ example Identifier `!`
 example Identifier `(unbalanced(`
 example Identifier '''
 `\`\\`
-'''
+'''*/
 
 
 /* Literals */
 Literal                   = { '1' #Stub }
-
+/*
 example Literal true
 example Literal false
 example Literal null
@@ -273,7 +287,7 @@ example Literal '''
 '''
 example Literal '''
 "hello\040world!"
-'''
+'''*/
 
 
 /* Keywords and Operators */
