@@ -43,7 +43,7 @@ example TypeDeclaration '''
 struct ID {}
 '''
 example TypeDeclaration '''
-Interface ID extends ID, ID {}
+interface ID extends ID, ID {}
 '''
 example MethodDeclaration '''
 public def ID(ID : Int) : int {}
@@ -96,18 +96,17 @@ example Block '''
 }
 '''
 example Statement ;
-example Statement var x = 1;
 example Statement {}
-example Statement exp;
+example Statement exp++;
 example Statement break;
 example Statement break ID;
 example Statement continue;
 example Statement if(exp) break;
 example Statement while(exp) {}
 example Statement do {} while(exp);
-example Statement for(exp; exp; exp) {}
+example Statement for(var x = 1; exp; exp++) {}
 example Statement return exp;
-example Statement ID : return;
+example Statement ID : while(exp) {}
 example Statement assert exp;
 example Statement assert exp : exp;
 example Statement throw exp;
@@ -131,7 +130,7 @@ try {
 '''
 example Statement at(exp) {}
 example Statement async {}
-example Statement async clocked() {}
+example Statement async clocked(exp) {}
 example Statement clocked async {}
 example Statement finish {}
 example Statement clocked finish {}
