@@ -16,6 +16,7 @@ ImportDeclarations        = { 'import I;' #Stub }
 
 TypeDeclarations          = { 'class X{}' #Stub }
 ClassDeclaration          = { 'class X{}' #Stub }
+ClassBody                 = { '{}' #Stub }
 StructDeclaration         = { 'struct X{}' #Stub }
 InterfaceDeclaration      = { 'interface X{}' #Stub }
 TypeDefDeclaration        = { 'type ID = int;' #Stub }
@@ -27,7 +28,11 @@ PropertyMethodDeclaration = { 'x() {}' #Stub }
 FieldDeclaration          = { 'x:Int;' #Stub }
 LocalVariableDeclaration  = { 'var x = 1' #Stub }
 Formals                   = { '(ID : Int)' #Stub }
+Formal                    = { '(ID : Int)' #Stub }
 LoopIndex                 = { 'li' #Stub }
+
+Guard                     = { '{}' #Stub }
+HasResultType             = { '<: Int' #Stub }
 
 example PackageDeclaration '''
 package ID.ID;
@@ -70,6 +75,11 @@ var ID : Int;
 
 /* Types */
 Type                      = { 'Int' #Stub }
+NamedType                 = { 'Int' #Stub }
+
+DepParams                 = { '{exp}' #Stub }
+
+TypeName                  = { 'Int' #Stub }
 
 Annotations               = { '@A' #Stub }
 
@@ -86,6 +96,7 @@ example Type (ID : Int) => Int
 
 /* Statements */
 Block                     = { '{}' #Stub }
+// _BlockStatements       = #Stub
 Statement                 = { 'stmt' #Stub }
 
 example Block {}
@@ -142,7 +153,13 @@ example Statement when(exp) {}
 
 /* Expressions */
 Arguments                 = { '()' #Stub }
+ArgumentList              = { '' #Stub }
 Expression                = { 'exp' #Stub }
+
+PrimaryExpression         = { 'exp' #Stub }
+
+StatementExpressionList   = { 'exp++' #Stub }
+StatementExpression       = { 'exp++' #Stub }
 
 example Expression ID
 example Expression 1
@@ -184,6 +201,7 @@ example Expression at(this) ID
 
 
 /* Identifiers */
+IdentifierList            = { 'ID' #Stub }
 Identifier                = { 'ID' #Stub }
 FullyQualifiedName        = { 'ID' #Stub }
 
@@ -255,7 +273,7 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
                           / "self" / "static" / "struct" / "super" / "switch"
                           / "this" / "throw" / "transient" / "true" / "try"
                           / "type" / "val" / "var" / "void" / "when"
-                          / "while"
+                          / "while" / "throws"
 "abstract"                = 'abstract' !W
 "as"                      = 'as' !W
 "assert"                  = 'assert' !W
@@ -317,6 +335,7 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
 "void"                    = 'void' !W
 "when"                    = 'when' !W
 "while"                   = 'while' !W
+"throws"                  = 'throws' !W
 "("                       = '('
 ")"                       = ')'
 "{"                       = '{'
@@ -328,7 +347,7 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
 "."                       = '.' ![.]
 "=="                      = '=='
 "!="                      = '!='
-"<"                       = '<' ![:<=]
+"<"                       = '<' !( '-' / [:<=] )
 ">"                       = '>' !( '-' / [=>] )
 "<="                      = '<='
 ">="                      = '>='
@@ -373,4 +392,5 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
 "!~"                      = '!~'
 "-<"                      = '-<'
 ">-"                      = '>-'
+"<-"                      = '<-'
 
