@@ -72,7 +72,7 @@ MethodDeclaration         = { ($(MethodMods) _)? "def" _ $(Identifier) (_ $(Type
                           / ApplyOpDecln
                           / SetOpDecln
                           / ConversionOpDecln
-BinOpDecln                = { $(MethodMods) _ "oprerator" (_ $(TypeParameters))? _ $(BinOpDeclnInner) (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) #BinOpDecln }
+BinOpDecln                = { $(MethodMods) _ "operator" (_ $(TypeParameters))? _ $(BinOpDeclnInner) (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) #BinOpDecln }
 BinOpDeclnInner           = { $({ "this" #This }) _ BinOp _ '(' _ $(Formal) _ ')' }
                           / { '(' _ $(Formal) _ ')' _ BinOp _ ('(' _ $(Formal) _ ')' / $({ "this" #This })) }
 BinOp                     = "+" #Add
@@ -103,7 +103,7 @@ BinOp                     = "+" #Add
                           / "~"
                           / "!~"
                           / "!"
-PrefixOpDecln             = { $(MethodMods) _ "oprerator" (_ $(TypeParameters))? _ $(PrefixOpDeclnInner) (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) }
+PrefixOpDecln             = { $(MethodMods) _ "operator" (_ $(TypeParameters))? _ $(PrefixOpDeclnInner) (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) #PrefixOpDecln }
 PrefixOpDeclnInner        = { PrefixOp _ ('(' _ $(Formal) _ ')' / $({ "this" #This })) }
 PrefixOp                  = "+" #Plus
                           / "-"
@@ -115,9 +115,12 @@ PrefixOp                  = "+" #Plus
                           / "*"
                           / "/"
                           / "%"
-ApplyOpDecln              = { }
-SetOpDecln                = { }
-ConversionOpDecln         = { }
+ApplyOpDecln              = { $(MethodMods) _ "operator" _ "this" (_ $(TypeParameters))? _ $(Formals) (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) #ApplyOpDecln }
+SetOpDecln                = { $(MethodMods) _ "operator" _ "this" (_ $(TypeParameters))? _ $(Formals) _ "=" _ '('_ $(Formal) _ ')' (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) #SetOpDecln }
+ConversionOpDecln         = ExplConvOpDecln
+                          / ImplConvOpDecln
+ExplConvOpDecln           = { $(MethodMods) _ "operator" (_ $(TypeParameters))? _ '('_ $(Formal) _ ')' _ "as" _ ($(Type) #ExplConvOpDecln / "?" #ExplConvOpDecln) (_ $(Guard))? _ $(MethodBody) }
+ImplConvOpDecln           = { $(MethodMods) _ "operator" (_ $(TypeParameters))? _ '('_ $(Formal) _ ')' (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) #ImplConvOpDecln }
 MethodMods                = { ($({ "property" #Property }) / $(Mod))+ #MethodMods }
 Throws                    = { "throws" _ $(ThrowList) #Throws }
 ThrowList                 = { $(Type) _ (_ ',' _ $(Type))* #ThrowList }
@@ -163,29 +166,29 @@ ClassType                 = { 'ID' #Stub }
 InterfaceType             = { 'ID' #Stub }
 IdList                    = { $(Identifier) (_ ',' _ $(Identifier))* #IdList }
 
-example PackageDeclaration ~330ab8a0a264a '''
+example PackageDeclaration '''
 package ID.ID;
 '''
-example ImportDeclarations ~ae89b17e0ec6f '''
+example ImportDeclarations '''
 import ID.ID;
 import ID.ID.*;
 '''
-example TypeDeclaration ~2be6aa6dbf57bd '''
+example TypeDeclaration '''
 class ID implements ID {}
 '''
-example TypeDeclaration ~4e9505bc5ea6 '''
+example TypeDeclaration '''
 struct ID {}
 '''
 example TypeDeclaration '''
 interface ID extends ID, ID {}
 '''
-example MethodDeclaration ~30358459dc '''
+example MethodDeclaration '''
 public def ID(ID : Int) : Int {}
 '''
 example MethodDeclaration '''
 public operator !(ID : Int) {}
 '''
-example PropertyMethodDeclaration ~fd89831068b5 '''
+example PropertyMethodDeclaration '''
 property ID(ID : Int) = exp;
 '''
 example FieldDeclaration '''
@@ -203,7 +206,7 @@ var ID : Int;
 
 
 /* Types */
-Type                      = { 'Int' #Stub }
+Type                      = { 'Int' #Stub } / Identifier
 
 NamedType                 = { 'Int' #Stub }
 
