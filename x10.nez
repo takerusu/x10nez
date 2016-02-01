@@ -11,12 +11,12 @@ LINECOMMENT               = '//' ( ![\r\n] . )*
 W                         = [a-zA-Z_0-9]
 
 /* Declarations */
-PackageDeclaration        = { ($(Annotations) _)? "package" _ $(PackageName) #PackageDeclaration }
+PackageDeclaration        = { ($(Annotations) _)? "package" _ $(PackageName) _ ';' #PackageDeclaration }
 PackageName               = Identifier {$ '.' $(Identifier) #PackageName }*
 ImportDeclarations        = { $(ImportDeclaration) (_ $(ImportDeclaration) )* #ImportDeclarations }
 ImportDeclaration         = { $(TypeImportOnDemandDecln) #ImportDeclaration }
                           / { $(SingleTypeImportDecln) #ImportDeclaration }
-TypeImportOnDemandDecln   = { "import" _ $(PackageOrTypeName) '.*' #TypeImportOnDemandDeclaration }
+TypeImportOnDemandDecln   = { "import" _ $(PackageOrTypeName) '.*' _ ';' #TypeImportOnDemandDeclaration }
 PackageOrTypeName         = Identifier {$ '.' $(Identifier) #PackageOrTypeName }*
 SingleTypeImportDecln     = { "import" _ $(TypeName) ';' #SingleTypeImportDeclaration }
 TypeName                  = Identifier {$ '.' $(Identifier) #TypeName }*
@@ -67,6 +67,57 @@ ExtendsInterfaces         = { "extends" _ $(Type) (_ ',' _ $(Type))* #ExtendsInt
 InterfaceBody             = { '{' (_  $(InterfaceMemberDecln))? _ '}' #InterfaceBody }
 TypeDefDeclaration        = { ($(Mods) _)? "type" _ $(Identifier) (_ $(TypeParameters))? (_ '(' _ FormalList _ ')')? (_ $(Guard))? _ '=' _ $(Type) _ ';' #TypeDefDeclaration }
 MethodDeclaration         = { ($(MethodMods) _)? "def" _ $(Identifier) (_ $(TypeParameters))? _ $(Formals) (_ $(Guard))? (_ $(Throws))? (_ $(HasResultType))? _ $(MethodBody) #MethodDeclaration }
+                          / BinOpDecln
+                          / PrefixOpDecln
+                          / ApplyOpDecln
+                          / SetOpDecln
+                          / ConversionOpDecln
+BinOpDecln                = { $(MethodMods) _ "oprerator" (_ $(TypeParameters))? _ $(BinOpDeclnInner) (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) #BinOpDecln }
+BinOpDeclnInner           = { $({ "this" #This }) _ BinOp _ '(' _ $(Formal) _ ')' }
+                          / { '(' _ $(Formal) _ ')' _ BinOp _ ('(' _ $(Formal) _ ')' / $({ "this" #This })) }
+BinOp                     = "+" #Add
+                          / "-"
+                          / "*"
+                          / "/"
+                          / "%"
+                          / "&"
+                          / "|"
+                          / "ˆ"
+                          / "&&"
+                          / "||"
+                          / "<<"
+                          / ">>"
+                          / ">>>"
+                          / ">="
+                          / "<="
+                          / "> "
+                          / "<"
+                          / "=="
+                          / "!="
+                          / ".."
+                          / "->"
+                          / "<-"
+                          / "-<"
+                          / ">-"
+                          / "**"
+                          / "~"
+                          / "!~"
+                          / "!"
+PrefixOpDecln             = { $(MethodMods) _ "oprerator" (_ $(TypeParameters))? _ $(PrefixOpDeclnInner) (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) }
+PrefixOpDeclnInner        = { PrefixOp _ ('(' _ $(Formal) _ ')' / $({ "this" #This })) }
+PrefixOp                  = "+" #Plus
+                          / "-"
+                          / "!"
+                          / "~"
+                          / "^"
+                          / "|"
+                          / "&"
+                          / "*"
+                          / "/"
+                          / "%"
+ApplyOpDecln              = { }
+SetOpDecln                = { }
+ConversionOpDecln         = { }
 MethodMods                = { ($({ "property" #Property }) / $(Mod))+ #MethodMods }
 Throws                    = { "throws" _ $(ThrowList) #Throws }
 ThrowList                 = { $(Type) _ (_ ',' _ $(Type))* #ThrowList }
@@ -80,12 +131,22 @@ ConstructorBody           = { $(ConstructorBlock) }
                           / {'=' _ $(ExplicitCtorInvo)}
                           / {'=' _ $(AssignPropCall)}
                           / { ';' #Empty }
-ConstructorBlock          = { '{' (_ $(ExplicitCtorInvo))? (_ $(BlockStmts))? _ '}' #ConstructorBlock }
-ExplicitCtorInvo          = {}
-AssignPropCall            = {}
+ConstructorBlock          = { '{' (_ $(ExplicitCtorInvo))? (_ $(BlockStatements))? _ '}' #ConstructorBlock }
+ExplicitCtorInvo          = { ($(PrimaryExpression) '.')? ("this" / "super") (_ $(TypeArguments))? _ '(' (_ $(ArgumentList))? _ ')' _ ';' #ExplicitCtorInvo }
+AssignPropCall            = { "property" _ (_ $(TypeArguments))? _ '(' (_ $(ArgumentList))? _ ')' _ ';' #AssignPropCall }
 PropertyMethodDeclaration = { ($(MethodMods) _)? _ $(Identifier) ((_ $(TypeParameters))? _ $(Formals))? (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) #PropertyMethodDeclaration }
-FieldDeclaration          = { 'x:Int;' #Stub }
-LocalVariableDeclaration  = { 'var x = 1' #Stub }
+FieldDeclaration          = { ($(Mods) _)? ($(VarKeyword) _ )? $(FieldDeclrs) _ ';' #FieldDeclaration }
+FieldDeclrs               = FieldDeclr { _ ',' _ $(FieldDeclr) #FieldDeclrs }*
+FieldDeclr                = { $(Identifier) (_ $(HasResultType))? _ '=' _ $(Expression) #FieldDeclr }
+                          / { $(Identifier) _ $(HasResultType) #FieldDeclr }
+LocalVariableDeclaration  = { ($(Mods) _ )? $(VarKeyword) _ ($(VariableDeclrs) #LocalVariableDeclaration / $(FormalDeclrs) #LocalFormalDeclaration) _ ';' }
+                          / { ($(Mods) _ )? $(VarDeclsWType) _ ';' }
+VarDeclsWType              = VarDeclWType {$ _ ',' _ $(VarDeclWType) #VarDeclsWType }*
+VarDeclWType               = { (($(Identifier) (_ ('[' $(IdentifierList) ']'))? ) / '[' $(IdentifierList) ']' ) (_ $(HasResultType)) _ "=" _ $(Expression) #VariableDeclr }
+VariableDeclrs            = VariableDeclr {$ _ ',' _ $(VariableDeclr) #VariableDeclrs }*
+VariableDeclr             = { (($(Identifier) (_ ('[' $(IdentifierList) ']'))? ) / '[' $(IdentifierList) ']' ) (_ $(HasResultType))? _ "=" _ $(Expression) #VariableDeclr }
+FormalDeclrs              = FormalDeclr {$ _ ',' _ $(FormalDeclr) #FormalDeclrs }*
+FormalDeclr               = { (($(Identifier) (_ ('[' $(IdentifierList) ']'))? ) / '[' $(IdentifierList) ']' ) _ $(ResultType) #FormalDeclr }
 Formals                   = { '(' (_ FormalList)? _ ')' #Formals }
 FormalList                = $(Formal) (_ ',' _ $(Formal))*
 Formal                    = { ($(Mods) _)? (_ $(VarKeyword))? $(FormalDeclaration) #Formal }
@@ -94,7 +155,8 @@ VarKeyword                = { "val" #Val }
                           / { "var" #Var }
 FormalDeclaration         = { '[' _ $(IdList) _ ']' _ $(ResultType) #FormalDeclaration }
                           / { $(Identifier) ( _ '[' _ $(IdList) _ ']')? _ $(ResultType) #FormalDeclaration }
-LoopIndex                 = { 'li' #Stub }
+LoopIndex                 = { ($(Mods) _)? (_ $(VarKeyword))? $(LoopIndexDeclr) #LoopIndex }
+LoopIndexDeclr            = { (($(Identifier) (_ ('[' $(IdentifierList) ']'))? ) / '[' $(IdentifierList) ']' ) (_ $(HasResultType))? #LoopIndexDeclr }
 
 
 ClassType                 = { 'ID' #Stub }
@@ -123,7 +185,7 @@ public def ID(ID : Int) : Int {}
 example MethodDeclaration '''
 public operator !(ID : Int) {}
 '''
-example PropertyMethodDeclaration '''
+example PropertyMethodDeclaration ~fd89831068b5 '''
 property ID(ID : Int) = exp;
 '''
 example FieldDeclaration '''
@@ -147,7 +209,7 @@ NamedType                 = { 'Int' #Stub }
 
 DepParams                 = { '{exp}' #Stub }
 
-TypeName                  = { 'Int' #Stub }
+/*TypeName                  = { 'Int' #Stub }*/
 
 Annotations               = { '@A' #Stub }
 
@@ -164,7 +226,7 @@ example Type (ID : Int) => Int*/
 
 /* Statements */
 Block                     = { '{}' #Stub }
-// _BlockStatements       = #Stub
+BlockStatements           = #Stub
 Statement                 = { 'stmt' #Stub }
 /*
 example Block {}
@@ -222,7 +284,7 @@ example Statement when(exp) {}*/
 /* Expressions */
 Arguments                 = { '()' #Stub }
 ArgumentList              = { '' #Stub }
-Expression                = { 'exp' #Stub }
+Expression                = { 'exp' #Stub } / Literal
 
 PrimaryExpression         = { 'exp' #Stub }
 
