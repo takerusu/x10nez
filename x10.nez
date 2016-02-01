@@ -142,6 +142,13 @@ var ID : Int;
 
 /* Types */
 Type                      = { 'Int' #Stub }
+
+NamedType                 = { 'Int' #Stub }
+
+DepParams                 = { '{exp}' #Stub }
+
+TypeName                  = { 'Int' #Stub }
+
 Annotations               = { '@A' #Stub }
 
 TypeArguments             = { '[Int,Int]' #Stub }
@@ -157,6 +164,7 @@ example Type (ID : Int) => Int*/
 
 /* Statements */
 Block                     = { '{}' #Stub }
+// _BlockStatements       = #Stub
 Statement                 = { 'stmt' #Stub }
 /*
 example Block {}
@@ -167,18 +175,17 @@ example Block '''
 }
 '''
 example Statement ;
-example Statement var x = 1;
 example Statement {}
-example Statement exp;
+example Statement exp++;
 example Statement break;
 example Statement break ID;
 example Statement continue;
 example Statement if(exp) break;
 example Statement while(exp) {}
 example Statement do {} while(exp);
-example Statement for(exp; exp; exp) {}
+example Statement for(var x = 1; exp; exp++) {}
 example Statement return exp;
-example Statement ID : return;
+example Statement ID : while(exp) {}
 example Statement assert exp;
 example Statement assert exp : exp;
 example Statement throw exp;
@@ -202,7 +209,7 @@ try {
 '''
 example Statement at(exp) {}
 example Statement async {}
-example Statement async clocked() {}
+example Statement async clocked(exp) {}
 example Statement clocked async {}
 example Statement finish {}
 example Statement clocked finish {}
@@ -214,7 +221,14 @@ example Statement when(exp) {}*/
 
 /* Expressions */
 Arguments                 = { '()' #Stub }
+ArgumentList              = { '' #Stub }
 Expression                = { 'exp' #Stub }
+
+PrimaryExpression         = { 'exp' #Stub }
+
+StatementExpressionList   = { 'exp++' #Stub }
+StatementExpression       = { 'exp++' #Stub }
+
 /*
 example Expression ID
 example Expression 1
@@ -256,6 +270,7 @@ example Expression at(this) ID*/
 
 
 /* Identifiers */
+IdentifierList            = { 'ID' #Stub }
 Identifier                = { 'ID' #Stub }
 FullyQualifiedName        = { 'ID' #Stub }
 /*
@@ -327,7 +342,7 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
                           / "self" / "static" / "struct" / "super" / "switch"
                           / "this" / "throw" / "transient" / "true" / "try"
                           / "type" / "val" / "var" / "void" / "when"
-                          / "while"
+                          / "while" / "throws"
 "abstract"                = 'abstract' !W
 "as"                      = 'as' !W
 "assert"                  = 'assert' !W
@@ -389,6 +404,7 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
 "void"                    = 'void' !W
 "when"                    = 'when' !W
 "while"                   = 'while' !W
+"throws"                  = 'throws' !W
 "("                       = '('
 ")"                       = ')'
 "{"                       = '{'
@@ -400,7 +416,7 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
 "."                       = '.' ![.]
 "=="                      = '=='
 "!="                      = '!='
-"<"                       = '<' ![:<=]
+"<"                       = '<' !( '-' / [:<=] )
 ">"                       = '>' !( '-' / [=>] )
 "<="                      = '<='
 ">="                      = '>='
@@ -445,3 +461,4 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
 "!~"                      = '!~'
 "-<"                      = '-<'
 ">-"                      = '>-'
+"<-"                      = '<-'
