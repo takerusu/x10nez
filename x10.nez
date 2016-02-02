@@ -18,8 +18,7 @@ ImportDeclaration         = { $(TypeImportOnDemandDecln) #ImportDeclaration }
                           / { $(SingleTypeImportDecln) #ImportDeclaration }
 TypeImportOnDemandDecln   = { "import" _ $(PackageOrTypeName) '.*' _ ';' #TypeImportOnDemandDeclaration }
 PackageOrTypeName         = Identifier {$ '.' $(Identifier) #PackageOrTypeName }*
-SingleTypeImportDecln     = { "import" _ $(TypeName) ';' #SingleTypeImportDeclaration }
-TypeName                  = Identifier {$ '.' $(Identifier) #TypeName }*
+SingleTypeImportDecln     = { "import" _ $(TypeName) _ ';' #SingleTypeImportDeclaration }
 
 TypeDeclarations          = { $(TypeDeclaration) (_ $(TypeDeclaration) )* #TypeDeclarations }
 TypeDeclaration           = ClassDeclaration
@@ -134,7 +133,7 @@ ConstructorBody           = { $(ConstructorBlock) }
                           / {'=' _ $(ExplicitCtorInvo)}
                           / {'=' _ $(AssignPropCall)}
                           / { ';' #Empty }
-ConstructorBlock          = { '{' (_ $(ExplicitCtorInvo))? (_ $(BlockStatements))? _ '}' #ConstructorBlock }
+ConstructorBlock          = { '{' (_ $(ExplicitCtorInvo))? (_ _BlockStatements)? _ '}' #ConstructorBlock }
 ExplicitCtorInvo          = { ($(PrimaryExpression) '.')? ("this" / "super") (_ $(TypeArguments))? _ '(' (_ $(ArgumentList))? _ ')' _ ';' #ExplicitCtorInvo }
 AssignPropCall            = { "property" _ (_ $(TypeArguments))? _ '(' (_ $(ArgumentList))? _ ')' _ ';' #AssignPropCall }
 PropertyMethodDeclaration = { ($(MethodMods) _)? _ $(Identifier) ((_ $(TypeParameters))? _ $(Formals))? (_ $(Guard))? (_ $(HasResultType))? _ $(MethodBody) #PropertyMethodDeclaration }
@@ -212,9 +211,15 @@ NamedType                 = { 'Int' #Stub }
 
 DepParams                 = { '{exp}' #Stub }
 
-/*TypeName                  = { 'Int' #Stub }*/
+
+ClassType                 = { 'Int' #Stub }
+InterfaceTypeList         = { 'Int' #Stub }
+ThrowsList                = { 'Int' #Stub }
+
+TypeName                  = Identifier {$ '.' $(Identifier) #TypeName }*
 
 Annotations               = { '@A' #Stub }
+Annotation                = { '@A' #Stub }
 
 TypeArguments             = { '[Int,Int]' #Stub }
 TypeParameters            = { '[ID,ID]' #Stub }
@@ -229,7 +234,8 @@ example Type (ID : Int) => Int*/
 
 /* Statements */
 Block                     = { '{}' #Stub }
-BlockStatements           = #Stub
+_BlockStatements          = #Stub
+LocalVariableDeclarationStatement = { 'var x = 1;' #Stub }
 Statement                 = { 'stmt' #Stub }
 /*
 example Block {}
@@ -290,7 +296,9 @@ Arguments                 = { '(exp)' #Stub }
 ArgumentList              = { 'exp' #Stub }
 Expression                = { 'exp' #Stub }
 
+//ClosureExpression
 PrimaryExpression         = { 'exp' #Stub }
+//array constructor is here
 
 StatementExpressionList   = { 'exp++' #Stub }
 StatementExpression       = { 'exp++' #Stub }
