@@ -155,15 +155,14 @@ Formal                    = { ($(Mods) _)? (_ $(VarKeyword))? $(FormalDeclaratio
                           / Type
 VarKeyword                = { "val" #Val }
                           / { "var" #Var }
-FormalDeclaration         = { '[' _ $(IdList) _ ']' _ $(ResultType) #FormalDeclaration }
-                          / { $(Identifier) ( _ '[' _ $(IdList) _ ']')? _ $(ResultType) #FormalDeclaration }
+FormalDeclaration         = { '[' _ $(IdentifierList) _ ']' _ $(ResultType) #FormalDeclaration }
+                          / { $(Identifier) ( _ '[' _ $(IdentifierList) _ ']')? _ $(ResultType) #FormalDeclaration }
 LoopIndex                 = { ($(Mods) _)? (_ $(VarKeyword))? $(LoopIndexDeclr) #LoopIndex }
 LoopIndexDeclr            = { (($(Identifier) (_ ('[' $(IdentifierList) ']'))? ) / '[' $(IdentifierList) ']' ) (_ $(HasResultType))? #LoopIndexDeclr }
 
 
 ClassType                 = { 'ID' #Stub }
 InterfaceType             = { 'ID' #Stub }
-IdList                    = { $(Identifier) (_ ',' _ $(Identifier))* #IdList }
 
 example PackageDeclaration '''
 package ID.ID;
