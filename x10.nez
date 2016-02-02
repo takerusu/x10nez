@@ -14,6 +14,9 @@ W                         = [a-zA-Z_0-9]
 PackageDeclaration        = { 'package P;' #Stub }
 ImportDeclarations        = { 'import I;' #Stub }
 
+PackageName               = { 'P' #Stub }
+PackageOrTypeName         = { 'P' #Stub }
+
 TypeDeclarations          = { 'class X{}' #Stub }
 ClassDeclaration          = { 'class X{}' #Stub }
 ClassBody                 = { '{}' #Stub }
@@ -31,7 +34,7 @@ Formals                   = { '(ID : Int)' #Stub }
 Formal                    = { 'ID : Int' #Stub }
 LoopIndex                 = { 'li' #Stub }
 
-Guard                     = { '{}' #Stub }
+Guard                     = { '{exp}' #Stub }
 HasResultType             = { '<: Int' #Stub }
 
 example PackageDeclaration '''
@@ -79,9 +82,14 @@ NamedType                 = { 'Int' #Stub }
 
 DepParams                 = { '{exp}' #Stub }
 
+ClassType                 = { 'Int' #Stub }
+InterfaceTypeList         = { 'Int' #Stub }
+ThrowsList                = { 'Int' #Stub }
+
 TypeName                  = { 'Int' #Stub }
 
 Annotations               = { '@A' #Stub }
+Annotation                = { '@A' #Stub }
 
 TypeArguments             = { '[Int,Int]' #Stub }
 TypeParameters            = { '[ID,ID]' #Stub }
@@ -96,7 +104,9 @@ example Type (ID : Int) => Int
 
 /* Statements */
 Block                     = { '{}' #Stub }
-// _BlockStatements       = #Stub
+_BlockStatements          = #Stub
+LocalVariableDeclarationStatement = { 'var x = 1;' #Stub }
+
 Statement                 = { 'stmt' #Stub }
 
 example Block {}
@@ -156,7 +166,9 @@ Arguments                 = { '(exp)' #Stub }
 ArgumentList              = { 'exp' #Stub }
 Expression                = { 'exp' #Stub }
 
+//ClosureExpression
 PrimaryExpression         = { 'exp' #Stub }
+//array constructor is here
 
 StatementExpressionList   = { 'exp++' #Stub }
 StatementExpression       = { 'exp++' #Stub }
