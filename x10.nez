@@ -60,16 +60,16 @@ example PropertyMethodDeclaration '''
 property ID(ID : Int) = exp;
 '''
 example FieldDeclaration '''
-private var ID : Int = 1;
+private var ID : Int = exp;
 '''
 example LocalVariableDeclaration '''
-var ID : Int = 1;
+var ID : Int = exp
 '''
 example LocalVariableDeclaration '''
-val ID = 1;
+val ID = exp
 '''
 example LocalVariableDeclaration '''
-var ID : Int;
+var ID : Int
 '''
 
 
@@ -192,9 +192,9 @@ example Expression ID == 1
 example Expression Int == Int
 example Expression ID instanceof Int
 example Expression (ID != 1) ? ID : ID
-example Expression new ID()
+example Expression new Int()
 example Expression ID.new ID()
-example Expression new ID() {}
+example Expression new Int() {}
 example Expression [1, 1, 1]
 example Expression (ID : Int) => @A {}
 example Expression at(this) ID
