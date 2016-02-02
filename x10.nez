@@ -28,7 +28,7 @@ PropertyMethodDeclaration = { 'x() {}' #Stub }
 FieldDeclaration          = { 'x:Int;' #Stub }
 LocalVariableDeclaration  = { 'var x = 1' #Stub }
 Formals                   = { '(ID : Int)' #Stub }
-Formal                    = { '(ID : Int)' #Stub }
+Formal                    = { 'ID : Int' #Stub }
 LoopIndex                 = { 'li' #Stub }
 
 Guard                     = { '{}' #Stub }
@@ -152,8 +152,8 @@ example Statement when(exp) {}
 
 
 /* Expressions */
-Arguments                 = { '()' #Stub }
-ArgumentList              = { '' #Stub }
+Arguments                 = { '(exp)' #Stub }
+ArgumentList              = { 'exp' #Stub }
 Expression                = { 'exp' #Stub }
 
 PrimaryExpression         = { 'exp' #Stub }
